@@ -3,7 +3,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
-import { resetProgress } from "@/lib/progress";
+import { resetProgress, getCompleted } from "@/lib/progress";
+
+const activityOrder = [
+  "/lucia/sonido-inicial",
+  "/lucia/discriminacion",
+  "/lucia/trazado",
+  "/lucia/silabas",
+  "/lucia/palabras",
+];
 
 export default function Sesion() {
   const router = useRouter();
@@ -18,7 +26,9 @@ export default function Sesion() {
       setCountdown(c);
       if (c <= 0) {
         clearInterval(interval);
-        router.push("/lucia");
+        const completed = getCompleted();
+        const next = activityOrder[completed.length] ?? "/sesion";
+        router.push(next);
       }
     }, 1000);
   };

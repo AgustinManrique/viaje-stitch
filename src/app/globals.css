@@ -15,7 +15,7 @@ html, body {
   font-family: 'Quicksand', 'Comic Sans MS', system-ui, -apple-system, sans-serif;
 }
 
-.font-kid { font-family: 'Quicksand', 'Comic Sans MS', system-ui, sans-serif; font-weight: 700; }
+.font-kid { font-family: 'Quicksand', 'Comic Sans MS', system-ui, sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
 .font-clean { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
 
 @keyframes float { 0%,100% { transform: translateY(0) rotate(-2deg);} 50% { transform: translateY(-12px) rotate(2deg);} }
