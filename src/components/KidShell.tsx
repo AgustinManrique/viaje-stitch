@@ -35,6 +35,7 @@ export function KidShell({
 }: {
   children: React.ReactNode;
   pieces?: number;
+  total?: number;   // kept for backwards compat, ActivityPuzzle derives its own total
   title: string;
 }) {
   const router  = useRouter();
