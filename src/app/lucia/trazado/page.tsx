@@ -1,0 +1,57 @@
+"use client";
+import { useRef, useState } from "react";
+import { KidShell } from "@/components/KidShell";
+import { Stitch } from "@/components/Stitch";
+import { CompletionScreen } from "@/components/CompletionScreen";
+import { markCompleted } from "@/lib/progress";
+
+export default function Trazado() {
+  const svgRef   = useRef<SVGSVGElement>(null);
+  const [paths, setPaths]     = useState<string[]>([]);
+  const [current, setCurrent] = useState("");
+  const drawing  = useRef(false);
+  const [showGuide, setShowGuide] = useState(true);
+  const [completed, setCompleted] = useState<number[] | null>(null);
+  const done = paths.length >= 1;
+
+  const toLocal = (e: React.PointerEvent) => {
+    const r = svgRef.current!.getBoundingClientRect();
+    return { x: ((e.clientX - r.left) / r.width) * 400, y: ((e.clientY - r.top) / r.height) * 400 };
+  };
+  const start = (e: React.PointerEvent) => { drawing.current = true; const p = toLocal(e); setCurrent(`M ${p.x} ${p.y}`); };
+  const move  = (e: React.PointerEvent) => { if (!drawing.current) return; const p = toLocal(e); setCurrent(c => `${c} L ${p.x} ${p.y}`); };
+  const end   = () => {
+    if (!drawing.current) return;
+    drawing.current = false;
+    setPaths(ps => { const next = [...ps, current]; if (next.length === 1) setTimeout(() => setCompleted(markCompleted(2)), 1200); return next; });
+    setCurrent("");
+  };
+
+  if (completed) return <CompletionScreen completed={completed} />;
+
+  return (
+    <KidShell title="✏️ Trazar la M" pieces={done ? 1 : 0} total={1}>
+      <div className="max-w-2xl mx-auto text-center">
+        <p className="font-kid text-white text-xl drop-shadow mb-3">Mirá cómo lo hace Stitch y dibujá vos</p>
+        <button onClick={() => { setShowGuide(false); setTimeout(() => setShowGuide(true), 50); }}
+          className="bg-yellow-300 text-[#1E5F8C] font-kid px-4 py-2 rounded-2xl btn-shadow mb-4">
+          🔁 Ver otra vez
+        </button>
+        <div className="bg-white rounded-3xl p-2 stitch-shadow">
+          <svg ref={svgRef} viewBox="0 0 400 400" className="w-full touch-none cursor-crosshair"
+            onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end}>
+            {showGuide && <path d="M 80 320 L 120 80 L 200 240 L 280 80 L 320 320" stroke="#E2E8F0" strokeWidth="44" strokeLinecap="round" strokeLinejoin="round" fill="none" />}
+            {showGuide && <path d="M 80 320 L 120 80 L 200 240 L 280 80 L 320 320" stroke="#FFD93D" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"
+              strokeDasharray="1500" style={{ strokeDashoffset: 1500, animation: "draw 2.5s ease-in-out forwards" }} />}
+            <style>{`@keyframes draw{to{stroke-dashoffset:0;}}`}</style>
+            {paths.map((p, i) => <path key={i} d={p} stroke="#1E5F8C" strokeWidth="10" strokeLinecap="round" fill="none" />)}
+            {current && <path d={current} stroke="#1E5F8C" strokeWidth="10" strokeLinecap="round" fill="none" />}
+          </svg>
+        </div>
+        <div className="mt-6 flex justify-center">
+          <Stitch size={110} mood={done ? "cheer" : "happy"} />
+        </div>
+      </div>
+    </KidShell>
+  );
+}
