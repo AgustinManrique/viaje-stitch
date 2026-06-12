@@ -107,7 +107,15 @@ export default function Palabras() {
             className="text-9xl focus:outline-none hover:scale-105 transition"
             aria-label="Imagen"
           >
-            {word.emoji}
+            {word.word == "MESA" ? (
+              <img
+                src="https://i.pinimg.com/474x/ac/e8/96/ace8967dee32e4b162293e9daa24ef82.jpg"
+                alt="Mesa"
+                className="mx-auto w-48 h-48 object-contain"
+              />
+            ) : (
+              word.emoji
+            )}
           </button>
         </div>
 
