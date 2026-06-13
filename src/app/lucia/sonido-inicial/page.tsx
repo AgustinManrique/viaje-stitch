@@ -3,22 +3,15 @@ import { useEffect, useState } from "react";
 import { KidShell } from "@/components/KidShell";
 import { Stitch } from "@/components/Stitch";
 import { CompletionScreen } from "@/components/CompletionScreen";
-import { markCompleted, getCompleted } from "@/lib/progress";
+import { markCompleted } from "@/lib/progress";
 import { useStitchAudio } from "@/hooks/useStitchAudio";
-
-const rounds = [
-  { letter: "A", correct: "Auto",     options: [{ emoji: "🌞", name: "SOL"   }, { emoji: "🚗", name: "AUTO"  }, { emoji: "🌙", name: "LUNA"  }] },
-  { letter: "M", correct: "Mono",     options: [{ emoji: "🐒", name: "MONO"  }, { emoji: "🐶", name: "PERRO" }, { emoji: "🐟", name: "PEZ"   }] },
-  { letter: "P", correct: "Pato",     options: [{ emoji: "🍎", name: "MANZANA" }, { emoji: "🌻", name: "FLOR" }, { emoji: "🦆", name: "PATO" }] },
-];
-
-const ROUND_AUDIO = [
-  "¿Cuál empieza con A?",
-  "¿Cuál empieza con M?",
-  "¿Cuál empieza con P?",
-];
+import { getConfig } from "@/lib/config";
 
 export default function SonidoInicial() {
+  const config = getConfig();
+  const rounds = config.sonidoInicial.rounds;
+  const roundAudios = rounds.map(r => r.audioPrompt ?? `¿Cuál empieza con ${r.letter}?`);
+
   const [idx, setIdx] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [feedback, setFeedback] = useState<"idle" | "ok" | "nope">("idle");
@@ -29,7 +22,7 @@ export default function SonidoInicial() {
   const allDone = correct >= rounds.length;
 
   useEffect(() => {
-    const fire = () => speak(ROUND_AUDIO[idx]);
+    const fire = () => speak(roundAudios[idx]);
     if (window.speechSynthesis.getVoices().length > 0) fire();
     else window.speechSynthesis.onvoiceschanged = fire;
   }, [idx, speak]);
@@ -65,7 +58,7 @@ export default function SonidoInicial() {
 
         {/* Letter to identify — tap to repeat audio */}
         <button
-          onClick={() => speak(ROUND_AUDIO[idx])}
+          onClick={() => speak(roundAudios[idx])}
           className="bg-yellow-300 text-[#1E5F8C] font-kid w-44 h-44 mx-auto rounded-full text-9xl btn-shadow flex items-center justify-center mb-2"
           aria-label={`Sonido ${round.letter}`}
         >

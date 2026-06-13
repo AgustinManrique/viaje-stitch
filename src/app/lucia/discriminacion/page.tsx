@@ -5,27 +5,20 @@ import { Stitch } from "@/components/Stitch";
 import { CompletionScreen } from "@/components/CompletionScreen";
 import { markCompleted } from "@/lib/progress";
 import { useStitchAudio } from "@/hooks/useStitchAudio";
-
-// Distractors use T and G — clearly different from M visually and phonetically
-const letters = [
-  { id: 0, ch: "M", x: 12, y: 12, target: true  },
-  { id: 1, ch: "T", x: 62, y: 8,  target: false },
-  { id: 2, ch: "M", x: 38, y: 38, target: true  },
-  { id: 3, ch: "G", x: 14, y: 62, target: false },
-  { id: 4, ch: "M", x: 70, y: 55, target: true  },
-  { id: 5, ch: "T", x: 46, y: 72, target: false },
-  { id: 6, ch: "G", x: 78, y: 25, target: false },
-];
-const totalTargets = letters.filter(l => l.target).length;
+import { getConfig } from "@/lib/config";
 
 export default function Discriminacion() {
+  const config = getConfig();
+  const { targetLetter, letters, audioPrompt } = config.discriminacion;
+  const totalTargets = letters.filter(l => l.target).length;
+
   const [found, setFound]         = useState<number[]>([]);
   const [wrong, setWrong]         = useState<number | null>(null);
   const [completed, setCompleted] = useState<number[] | null>(null);
   const speak = useStitchAudio();
 
   useEffect(() => {
-    const fire = () => speak("Tocá todas las M que veas");
+    const fire = () => speak(audioPrompt ?? `Tocá todas las ${targetLetter} que veas`);
     if (window.speechSynthesis.getVoices().length > 0) fire();
     else window.speechSynthesis.onvoiceschanged = fire;
   }, [speak]);
@@ -48,13 +41,13 @@ export default function Discriminacion() {
   if (completed) return <CompletionScreen completed={completed} />;
 
   return (
-    <KidShell title="🔍 Buscar la M" pieces={found.length} total={totalTargets}>
+    <KidShell title={`🔍 Buscar la ${targetLetter}`} pieces={found.length} total={totalTargets}>
       <div className="max-w-3xl mx-auto text-center pt-4">
 
         {/* Target letter reminder */}
-        <div className="flex justify-center mb-4">
-          <div className="bg-yellow-300 text-[#1E5F8C] font-kid text-5xl w-20 h-20 rounded-2xl flex items-center justify-center btn-shadow">
-            M
+        <div className="flex justify-center mb-10">
+          <div className="bg-yellow-300 text-[#1E5F8C] font-kid text-9xl w-40 h-40 rounded-2xl flex items-center justify-center btn-shadow">
+            {targetLetter}
           </div>
         </div>
 

@@ -5,43 +5,11 @@ import { Stitch } from "@/components/Stitch";
 import { CompletionScreen } from "@/components/CompletionScreen";
 import { markCompleted } from "@/lib/progress";
 import { useStitchAudio } from "@/hooks/useStitchAudio";
-
-type WordData = {
-  word: string;
-  emoji: string;
-  syllables: string[];
-  optionsPerBox: string[][];
-};
-
-// MESA uses 🍽️ (closest to a table/dining setting — no standard table emoji exists)
-const words: WordData[] = [
-  {
-    word: "PATO",
-    emoji: "🦆",
-    syllables: ["PA", "TO"],
-    optionsPerBox: [["PA", "CE"], ["TO", "MA"]],
-  },
-  {
-    word: "MESA",
-    emoji: "🍽️",
-    syllables: ["ME", "SA"],
-    optionsPerBox: [["ME", "PA"], ["SA", "TO"]],
-  },
-  {
-    word: "LUNA",
-    emoji: "🌙",
-    syllables: ["LU", "NA"],
-    optionsPerBox: [["LU", "PA"], ["NA", "MA"]],
-  },
-  {
-    word: "MAPA",
-    emoji: "🗺️",
-    syllables: ["MA", "PA"],
-    optionsPerBox: [["MA", "CE"], ["PA", "TO"]],
-  },
-];
+import { getConfig } from "@/lib/config";
 
 export default function Palabras() {
+  const config = getConfig();
+  const { words, audioPrompt } = config.palabras;
   const [wordIdx, setWordIdx]   = useState(0);
   const [filled, setFilled]     = useState<(string | null)[]>(words[0].syllables.map(() => null));
   const [activeBox, setActiveBox] = useState(0);
@@ -53,7 +21,7 @@ export default function Palabras() {
   const word  = words[wordIdx];
 
   useEffect(() => {
-    const fire = () => speak("¿Qué palabra es?");
+    const fire = () => speak(audioPrompt ?? "¿Qué palabra es?");
     if (window.speechSynthesis.getVoices().length > 0) fire();
     else window.speechSynthesis.onvoiceschanged = fire;
   }, [wordIdx, speak]);
@@ -107,10 +75,10 @@ export default function Palabras() {
             className="text-9xl focus:outline-none hover:scale-105 transition"
             aria-label="Imagen"
           >
-            {word.word == "MESA" ? (
+            {word.imageUrl ? (
               <img
-                src="https://i.pinimg.com/474x/ac/e8/96/ace8967dee32e4b162293e9daa24ef82.jpg"
-                alt="Mesa"
+                src={word.imageUrl}
+                alt={word.word}
                 className="mx-auto w-48 h-48 object-contain"
               />
             ) : (

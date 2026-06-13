@@ -5,13 +5,14 @@ import { Stitch } from "@/components/Stitch";
 import { CompletionScreen } from "@/components/CompletionScreen";
 import { markCompleted } from "@/lib/progress";
 import { useStitchAudio } from "@/hooks/useStitchAudio";
-
-const vowels = ["A", "E", "I", "O", "U"];
-const consonant = "P";
+import { getConfig } from "@/lib/config";
 
 type Line = { x1: number; y1: number; x2: number; y2: number };
 
 export default function Silabas() {
+  const config = getConfig();
+  const { consonant, vowels, audioPrompt } = config.silabas;
+
   const [formed, setFormed]       = useState<string[]>([]);
   const [completed, setCompleted] = useState<number[] | null>(null);
   const speak = useStitchAudio();
@@ -28,7 +29,7 @@ export default function Silabas() {
   const [connectedLines, setConnectedLines] = useState<Map<string, Line>>(new Map());
 
   useEffect(() => {
-    const fire = () => speak("Arrastrá la P hasta cada vocal");
+    const fire = () => speak(audioPrompt ?? "Arrastrá la P hasta cada vocal");
     if (window.speechSynthesis.getVoices().length > 0) fire();
     else window.speechSynthesis.onvoiceschanged = fire;
   }, [speak]);
@@ -148,7 +149,7 @@ export default function Silabas() {
           {/* 3-column layout */}
           <div className="grid grid-cols-3 gap-x-12 items-stretch">
 
-            {/* Col 1 — P (drag source, centered vertically) */}
+            {/* Col 1 — drag source */}
             <div className="flex items-center justify-center">
               <button
                 ref={pButtonRef}

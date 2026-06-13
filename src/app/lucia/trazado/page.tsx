@@ -5,8 +5,11 @@ import { Stitch } from "@/components/Stitch";
 import { CompletionScreen } from "@/components/CompletionScreen";
 import { markCompleted } from "@/lib/progress";
 import { useStitchAudio } from "@/hooks/useStitchAudio";
+import { getConfig } from "@/lib/config";
 
 export default function Trazado() {
+  const config = getConfig();
+  const { guideLetter, guidePath, audioPrompt } = config.trazado;
   const svgRef    = useRef<SVGSVGElement>(null);
   const [paths, setPaths]     = useState<string[]>([]);
   const [current, setCurrent] = useState("");
@@ -17,7 +20,7 @@ export default function Trazado() {
   const speak = useStitchAudio();
 
   useEffect(() => {
-    const fire = () => speak("Mirá cómo lo hace Stitch y dibujá vos");
+    const fire = () => speak(audioPrompt ?? "Mirá cómo lo hace Stitch y dibujá vos");
     if (window.speechSynthesis.getVoices().length > 0) fire();
     else window.speechSynthesis.onvoiceschanged = fire;
   }, [speak]);
@@ -45,7 +48,7 @@ export default function Trazado() {
   if (completed) return <CompletionScreen completed={completed} />;
 
   return (
-    <KidShell title="✏️ Trazar la M" pieces={done ? 1 : 0} total={1}>
+    <KidShell title={`✏️ Trazar la ${guideLetter}`} pieces={done ? 1 : 0} total={1}>
       <div className="max-w-2xl mx-auto text-center pt-4">
 
         {/* Repeat guide button */}
@@ -62,8 +65,8 @@ export default function Trazado() {
         <div className="bg-white rounded-3xl p-2 shadow-lg">
           <svg ref={svgRef} viewBox="0 0 400 400" className="w-full touch-none cursor-crosshair"
             onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerLeave={end}>
-            {showGuide && <path d="M 80 320 L 120 80 L 200 240 L 280 80 L 320 320" stroke="#E2E8F0" strokeWidth="44" strokeLinecap="round" strokeLinejoin="round" fill="none" />}
-            {showGuide && <path d="M 80 320 L 120 80 L 200 240 L 280 80 L 320 320" stroke="#FFD93D" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"
+            {showGuide && <path d={guidePath} stroke="#E2E8F0" strokeWidth="44" strokeLinecap="round" strokeLinejoin="round" fill="none" />}
+            {showGuide && <path d={guidePath} stroke="#FFD93D" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"
               strokeDasharray="1500" style={{ strokeDashoffset: 1500, animation: "draw 2.5s ease-in-out forwards" }} />}
             <style>{`@keyframes draw{to{stroke-dashoffset:0;}}`}</style>
             {paths.map((p, i) => <path key={i} d={p} stroke="#1E5F8C" strokeWidth="10" strokeLinecap="round" fill="none" />)}
