@@ -1,7 +1,7 @@
 "use client";
-import { useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRef, useCallback, useState } from "react";
 import { ActivityPuzzle } from "./ActivityPuzzle";
+import { DescansoScreen } from "./DescansoScreen";
 
 const ACTIVITY_KEYS: [string, string][] = [
   ["sonido-inicial", "sonido-inicial"],
@@ -38,9 +38,9 @@ export function KidShell({
   total?: number;   // kept for backwards compat, ActivityPuzzle derives its own total
   title: string;
 }) {
-  const router  = useRouter();
   const tapCount = useRef(0);
   const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [resting, setResting] = useState(false);
   const key  = resolveKey(title);
   const icon = ACTIVITY_ICONS[key] ?? "⭐";
 
@@ -49,11 +49,13 @@ export function KidShell({
     if (tapTimer.current) clearTimeout(tapTimer.current);
     if (tapCount.current >= 3) {
       tapCount.current = 0;
-      router.push("/sesion");
+      setResting(true);
       return;
     }
     tapTimer.current = setTimeout(() => { tapCount.current = 0; }, 800);
-  }, [router]);
+  }, []);
+
+  if (resting) return <DescansoScreen />;
 
   return (
     <div className="min-h-screen" style={{ background: "#FFF8E7" }}>
