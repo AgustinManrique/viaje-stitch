@@ -23,8 +23,8 @@ export default function SonidoInicial() {
   const playRoundAudio = () => {
   if (roundAudios[idx].includes("¿Cuál empieza con M?")) {
     const audio = new Audio("/sonido-m.mp3");
-    speak("¿Cuál empieza con?")
-    audio.play();
+    speak("¿Cuál empieza con?");
+    setTimeout(audio.play,2000);
   } else {
     speak(roundAudios[idx]);
   }
