@@ -20,9 +20,16 @@ export default function SonidoInicial() {
 
   const round = rounds[idx];
   const allDone = correct >= rounds.length;
-
+  const playRoundAudio = () => {
+  if (roundAudios[idx].includes("¿Cuál empieza con M?")) {
+    const audio = new Audio("/sonido-m.mp3");
+    audio.play();
+  } else {
+    speak(roundAudios[idx]);
+  }
+};
   useEffect(() => {
-    const fire = () => speak(roundAudios[idx]);
+    const fire = playRoundAudio;
     if (window.speechSynthesis.getVoices().length > 0) fire();
     else window.speechSynthesis.onvoiceschanged = fire;
   }, [idx, speak]);
@@ -58,7 +65,7 @@ export default function SonidoInicial() {
 
         {/* Letter to identify — tap to repeat audio */}
         <button
-          onClick={() => speak(roundAudios[idx])}
+          onClick={playRoundAudio}
           className="bg-yellow-300 text-[#1E5F8C] font-kid w-44 h-44 mx-auto rounded-full text-9xl btn-shadow flex items-center justify-center mb-2"
           aria-label={`Sonido ${round.letter}`}
         >
